@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Roasting Timer</title>
+    <meta name="description" content="Professional coffee roasting timer with development time projections and weight loss calculation.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1>Roast Master</h1>
+            <div class="badge">v2.0</div>
+        </header>
+
+        <main class="main-content">
+            <!-- Timer Section -->
+            <section class="timer-card glass-panel">
+                <div class="timer-display" id="timerDisplay">00:00</div>
+                <div class="timer-controls">
+                    <button id="startBtn" class="btn btn-primary">Start Roast</button>
+                    <button id="firstCrackBtn" class="btn btn-accent" disabled>First Crack</button>
+                    <button id="resetBtn" class="btn btn-ghost" title="Reset Timer">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                            <path d="M3 3v5h5"/>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Metrics Grid -->
+            <div class="metrics-grid">
+                <!-- Milestones Card -->
+                <section class="card milestones-card">
+                    <h2>Milestones</h2>
+                    <div class="milestone-item">
+                        <span class="label">First Crack</span>
+                        <span class="value" id="fcTime">--:--</span>
+                    </div>
+                    <div class="milestone-item">
+                        <span class="label">Development Time</span>
+                        <span class="value highlight-text" id="devTimeDisplay">00:00</span>
+                    </div>
+                    <div class="milestone-item">
+                        <span class="label">Dev Ratio (DTR)</span>
+                        <span class="value" id="dtrDisplay">0.0%</span>
+                    </div>
+                </section>
+
+                <!-- Projections Card -->
+                <section class="card projections-card">
+                    <h2>Projections</h2>
+                    <div class="projection-list">
+                        <div class="projection-item">
+                            <span class="proj-label">15.0%</span>
+                            <span class="proj-time" id="proj15">--:--</span>
+                        </div>
+                        <div class="projection-item">
+                            <span class="proj-label">17.5%</span>
+                            <span class="proj-time" id="proj175">--:--</span>
+                        </div>
+                        <div class="projection-item">
+                            <span class="proj-label">20.0%</span>
+                            <span class="proj-time" id="proj20">--:--</span>
+                        </div>
+                        <div class="projection-item">
+                            <span class="proj-label">22.5%</span>
+                            <span class="proj-time" id="proj225">--:--</span>
+                        </div>
+                        <div class="projection-item">
+                            <span class="proj-label">25.0%</span>
+                            <span class="proj-time" id="proj25">--:--</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Data Entry Card -->
+            <section class="card data-card">
+                <h2>Roast Data</h2>
+                <div class="form-group">
+                    <label for="beanName">Bean Name</label>
+                    <input type="text" id="beanName" placeholder="e.g. Ethiopia Yirgacheffe">
+                </div>
+                
+                <div class="weight-grid">
+                    <div class="form-group">
+                        <label for="greenWeight">Green Weight (g)</label>
+                        <input type="number" id="greenWeight" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="roastWeight">Roast Weight (g)</label>
+                        <input type="number" id="roastWeight" placeholder="0">
+                    </div>
+                    <div class="result-group">
+                        <label>Weight Loss</label>
+                        <div class="result-value" id="weightLossDisplay">0.00%</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Date</label>
+                    <div class="date-display" id="dateDisplay"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

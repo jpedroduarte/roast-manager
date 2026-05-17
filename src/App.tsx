@@ -13,6 +13,7 @@ import { RoastForm } from './components/RoastForm';
 import { RecipeCard } from './components/RecipeCard';
 import { HistoryDrawer } from './components/HistoryDrawer';
 import { RecipeDialog } from './components/RecipeDialog';
+import { ConfirmationDialog } from './components/ConfirmationDialog';
 
 export default function App() {
   // --- State ---
@@ -37,6 +38,10 @@ export default function App() {
   const [recipeSteps, setRecipeSteps] = useState<RecipeStep[]>([]);
   const [isRecipeDialogOpen, setIsRecipeDialogOpen] = useState(false);
 
+  // UI State
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [roastToDeleteId, setRoastToDeleteId] = useState<string | null>(null);
+
   const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
   // --- Date ---
@@ -51,26 +56,50 @@ export default function App() {
 
   // --- Persistence Handlers ---
   useEffect(() => {
-    const saved = localStorage.getItem('roastHistory');
-    if (saved) {
-      try {
-        setRoastHistory(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to parse roast history', e);
-      }
-    }
+    fetch('/api/history')
+      .then(res => res.json())
+      .then(data => setRoastHistory(data))
+      .catch(err => console.error('Failed to load roast history', err));
   }, []);
 
-  const saveToHistory = (newLog: RoastLog) => {
+  const saveToHistory = async (newLog: RoastLog) => {
     const updated = [newLog, ...roastHistory];
     setRoastHistory(updated);
-    localStorage.setItem('roastHistory', JSON.stringify(updated));
+    try {
+      await fetch('/api/history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+    } catch (err) {
+      console.error('Failed to save to local file', err);
+    }
   };
 
   const deleteRoast = (id: string) => {
-    const updated = roastHistory.filter(r => r.id !== id);
+    setRoastToDeleteId(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!roastToDeleteId) return;
+
+    const updated = roastHistory.map(r => 
+      r.id === roastToDeleteId ? { ...r, deletedAt: Date.now() } : r
+    );
     setRoastHistory(updated);
-    localStorage.setItem('roastHistory', JSON.stringify(updated));
+    setIsDeleteDialogOpen(false);
+    setRoastToDeleteId(null);
+
+    try {
+      await fetch('/api/history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+    } catch (err) {
+      console.error('Failed to save to local file', err);
+    }
   };
 
   // --- Timer Operations ---
@@ -151,9 +180,9 @@ export default function App() {
     const roast = parseFloat(roastWeight);
     if (green > 0 && roast > 0) {
       const loss = ((green - roast) / green) * 100;
-      return `${loss.toFixed(2)}%`;
+      return loss;
     }
-    return '0.00%';
+    return 0;
   };
 
   const handleSaveRoast = () => {
@@ -172,8 +201,8 @@ export default function App() {
       totalSeconds,
       dryEndTime,
       firstCrackTime,
-      dtr,
-      weightLoss: calculateWeightLoss()
+      developmentTimePct: dtr,
+      weightLossPct: calculateWeightLoss(),
     };
 
     saveToHistory(newRoast);
@@ -260,7 +289,7 @@ export default function App() {
                 setGreenWeight={setGreenWeight}
                 roastWeight={roastWeight}
                 setRoastWeight={setRoastWeight}
-                weightLoss={calculateWeightLoss()}
+                weightLoss={`${calculateWeightLoss().toFixed(2)}%`}
                 currentDate={currentDate}
                 onSave={handleSaveRoast}
                 isSaveDisabled={totalSeconds === 0}
@@ -284,6 +313,19 @@ export default function App() {
         onAddStep={handleAddStep}
         onUpdateStep={handleUpdateStep}
         onRemoveStep={handleRemoveStep}
+      />
+
+      <ConfirmationDialog
+        open={isDeleteDialogOpen}
+        title="Delete Roast Log?"
+        message="This will remove the roast from your history. You can't undo this from the app UI, but the data will be preserved in your local history file."
+        confirmLabel="Delete"
+        isDestructive
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          setIsDeleteDialogOpen(false);
+          setRoastToDeleteId(null);
+        }}
       />
     </ThemeProvider>
   );

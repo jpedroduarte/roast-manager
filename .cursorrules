@@ -1,0 +1,5 @@
+# Agent Rules
+
+- **Plan First:** Always provide a detailed implementation plan to the user before making any changes to the codebase.
+- **Wait for Approval:** Do not proceed with file modifications until the user has explicitly approved the plan.
+- **Concise Summaries:** Keep plans structured with clear steps (e.g., Data Model, Logic, UI).

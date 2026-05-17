@@ -8,8 +8,9 @@ export interface RoastLog {
   totalSeconds: number;
   dryEndTime: number | null;
   firstCrackTime: number | null;
-  dtr: number;
-  weightLoss: string;
+  developmentTimePct: number;
+  weightLossPct: number;
+  deletedAt?: number;
 }
 
 export interface RecipeStep {
